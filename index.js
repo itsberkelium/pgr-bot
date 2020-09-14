@@ -6,10 +6,9 @@ const client = new Discord.Client();
 
 const prefix = "!pgr";
 
-const port = process.env.PORT || 3000;
 const url = process.env.URL || "http://localhost";
 const API = Axios.create({
-  baseURL: `${url}:${port}`,
+  baseURL: `${url}`,
 });
 
 client.on("ready", () => {
