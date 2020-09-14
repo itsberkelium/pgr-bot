@@ -1,8 +1,6 @@
+const dotenv = require("dotenv").config();
 const { default: Axios } = require("axios");
 const Discord = require("discord.js");
-const conf = require("./config.json");
-
-const axios = require("axios").default;
 
 const client = new Discord.Client();
 
