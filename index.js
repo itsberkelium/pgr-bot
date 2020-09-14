@@ -5,8 +5,11 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 
 const prefix = "!pgr";
+
+const port = process.env.PORT || 3000;
+const url = process.env.PORT || "http://localhost";
 const API = Axios.create({
-  baseURL: "https://pgr-backend.herokuapp.com:3000/",
+  baseURL: `${url}:${port}`,
 });
 
 client.on("ready", () => {
