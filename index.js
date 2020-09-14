@@ -5,7 +5,9 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 
 const prefix = "!pgr";
-const API = Axios.create({ baseURL: "http://localhost:3000/" });
+const API = Axios.create({
+  baseURL: "https://pgr-backend.herokuapp.com:3000/",
+});
 
 client.on("ready", () => {
   console.log(`Ready to roll as ${client.user.tag}`);
