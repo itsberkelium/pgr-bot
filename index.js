@@ -38,7 +38,7 @@ client.on("message", function (message) {
 
       embed.setTitle("PGR Racing Pilotları");
 
-      data.map((driver, index) => {
+      data.map((driver) => {
         embed.addField(
           driver.name,
           `${driver.team.title}\n${driver.psn}\nŞampiyonluk: ${driver.championships}`,
@@ -51,6 +51,24 @@ client.on("message", function (message) {
       );
 
       message.reply(embed);
+    });
+  }
+
+  if (command === "yedekpilotlar") {
+    API.get("driver?optionsonly=true").then((r) => {
+      const { data } = r;
+
+      if (data.length) {
+        const embed = new Discord.MessageEmbed();
+
+        embed.setTitle("PGR Racing Yedek Pilotları");
+
+        data.map((driver) => {
+          embed.addField(driver.name, `${driver.psn}`, true);
+        });
+
+        message.reply(embed);
+      } else message.reply("henüz yedek pilot bulunmuyor.");
     });
   }
 
