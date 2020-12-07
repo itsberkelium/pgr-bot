@@ -27,31 +27,35 @@ client.on("message", function (message) {
 
   if (command === "ping") {
     const timeTaken = Date.now() - message.createdTimestamp;
-    message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
+    message.reply(
+      `Pong! This message had a latency of ${timeTaken}ms. Also, hello!`
+    );
   }
 
   if (command === "pilotlar") {
-    API.get("driver").then((r) => {
-      const { data } = r;
+    API.get("driver")
+      .then((r) => {
+        const { data } = r;
 
-      const embed = new Discord.MessageEmbed();
+        const embed = new Discord.MessageEmbed();
 
-      embed.setTitle("PGR Racing Pilotları");
+        embed.setTitle("PGR Racing Pilotları");
 
-      data.map((driver) => {
-        embed.addField(
-          driver.name,
-          `${driver.team.title}\n${driver.psn}\nŞampiyonluk: ${driver.championships}`,
-          true
+        data.map((driver) => {
+          embed.addField(
+            driver.name,
+            `${driver.team.title}\n${driver.psn}\nŞampiyonluk: ${driver.championships}`,
+            true
+          );
+        });
+
+        embed.setFooter(
+          `Yedek pilotları görmek için "${prefix} yedekpilotlar" komutunu kullanın.`
         );
-      });
 
-      embed.setFooter(
-        `Yedek pilotları görmek için "${prefix} yedekpilotlar" komutunu kullanın.`
-      );
-
-      message.reply(embed);
-    });
+        message.reply(embed);
+      })
+      .catch((err) => console.log(err));
   }
 
   if (command === "yedekpilotlar") {
