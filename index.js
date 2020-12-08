@@ -1,15 +1,22 @@
+const fs = require("fs");
 const dotenv = require("dotenv").config();
-const { default: Axios } = require("axios");
 const Discord = require("discord.js");
+const API = require("./API");
 
 const client = new Discord.Client();
 
 const prefix = "!pgr";
 
-const url = process.env.URL || "http://localhost";
-const API = Axios.create({
-  baseURL: `${url}`,
-});
+client.commands = new Discord.Collection();
+
+const commandFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
+}
 
 client.on("ready", () => {
   console.log(`Ready to roll as ${client.user.tag}`);
@@ -23,73 +30,26 @@ client.on("message", function (message) {
 
   const commandBody = message.content.slice(prefix.length + 1);
   const args = commandBody.split(" ");
-  const command = args.shift().toLowerCase();
+  const commandName = args.shift().toLowerCase();
 
-  if (command === "ping") {
+  if (commandName === "ping") {
     const timeTaken = Date.now() - message.createdTimestamp;
-    message.reply(
-      `Pong! This message had a latency of ${timeTaken}ms. Also, hello!`
-    );
+    message.reply(`Pong! This message had a latency of ${timeTaken}ms!`);
   }
 
-  if (command === "pilotlar") {
-    API.get("driver")
-      .then((r) => {
-        const { data } = r;
+  if (!client.commands.has(commandName)) return;
 
-        const embed = new Discord.MessageEmbed();
+  const command = client.commands.get(commandName);
 
-        embed.setTitle("PGR Racing Pilotları");
-
-        data.map((driver) => {
-          embed.addField(
-            driver.name,
-            `${driver.team.title}\n${driver.psn}\nŞampiyonluk: ${driver.championships}`,
-            true
-          );
-        });
-
-        embed.setFooter(
-          `Yedek pilotları görmek için "${prefix} yedekpilotlar" komutunu kullanın.`
-        );
-
-        message.reply(embed);
-      })
-      .catch((err) => console.log(err));
+  if (command.args && !args.length) {
+    return message.channel.send(`Eksik komut gönderdin, ${message.author}!`);
   }
 
-  if (command === "yedekpilotlar") {
-    API.get("driver?optionsonly=true").then((r) => {
-      const { data } = r;
-
-      if (data.length) {
-        const embed = new Discord.MessageEmbed();
-
-        embed.setTitle("PGR Racing Yedek Pilotları");
-
-        data.map((driver) => {
-          embed.addField(driver.name, `${driver.psn}`, true);
-        });
-
-        message.reply(embed);
-      } else message.reply("henüz yedek pilot bulunmuyor.");
-    });
-  }
-
-  if (command === "takımlar") {
-    API.get("team").then((r) => {
-      const { data } = r;
-
-      const embed = new Discord.MessageEmbed();
-
-      embed.setTitle("PGR Racing Takımları");
-
-      data.map((team) => {
-        embed.addField(team.title, `Şampiyonluk: ${team.championships}`, true);
-      });
-
-      message.reply(embed);
-    });
+  try {
+    command.execute(message, args, prefix);
+  } catch (error) {
+    console.error(error);
+    message.reply("Bu komutu çalıştırırken hata oluştu!");
   }
 });
 
