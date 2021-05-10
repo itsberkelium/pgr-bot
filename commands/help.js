@@ -28,7 +28,7 @@ module.exports = {
             error
           );
           message.reply(
-            "Sana özel mesaj gönderemedim. Özel mesajların kapalı olabilir mi?"
+            "sana özel mesaj gönderemedim. Özel mesajların kapalı olabilir mi?"
           );
         });
     }
